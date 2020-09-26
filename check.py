@@ -37,7 +37,7 @@ def check():
     try:
         for payload in build_payoad():
             # inject in url
-            if 'localhost' in requests.get(url + payload).content:
+            if 'localhost' in requests.get(url + payload, timeout=4).content:
                 return resp(True)
     except Exception as ex:
         pass
