@@ -4,11 +4,19 @@ import json
 
 default_payload = '../../../../../../../../etc/hosts'
 
-url = 'https://{0}/'.format(os.environ.get('DOMAIN'))
+
+ports = os.environ.get('PORTS')
+ports = ports.strip(' ').split(',')
+urls = ['https://{0}/'.format(os.environ.get('DOMAIN'))]
+try:
+    for port in ports:
+        urls.append('http://{0}:{1}/'.format(os.environ.get('DOMAIN'), port))
+except:
+    pass
 vuln_id = os.environ.get('VULN_ID')
 
 
-def resp(state=False):
+def resp(state=False, url='https://{0}/'.format(os.environ.get('DOMAIN'))):
     if state:
         return json.dumps({"vulnerable": "True", "vuln_id": vuln_id, "description": url})
     else:
@@ -37,11 +45,12 @@ def check():
     try:
         for payload in build_payoad():
             # inject in url
-            if 'localhost' in requests.get(url + payload, timeout=4).content:
-                return resp(True)
+            for url in urls:
+                if 'localhost' in requests.get(url + payload, timeout=4, verify=False).content:
+                    return resp(True, url)
     except Exception as ex:
         pass
-    return resp(False)
+    return resp(False, '')
 
 
 if __name__ == '__main__':
