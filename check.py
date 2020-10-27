@@ -1,6 +1,8 @@
 import requests
 import os
 import json
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 default_payload = '../../../../../../../../etc/hosts'
 
@@ -50,7 +52,7 @@ def check():
                     return resp(True, url)
     except Exception as ex:
         pass
-    return resp(False, '')
+    return resp(False, urls[0])
 
 
 if __name__ == '__main__':
